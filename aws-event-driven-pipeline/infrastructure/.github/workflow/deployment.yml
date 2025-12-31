@@ -1,0 +1,59 @@
+name: Deploy AWS Event-Driven Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: infra
+
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: infra
+
+    - name: Terraform Plan
+      run: terraform plan
+      working-directory: infra
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: infra
+
+    - name: Get API endpoint
+      id: tf_output
+      run: |
+        echo "API_URL=$(terraform output -raw api_endpoint)" >> $GITHUB_ENV
+      working-directory: infra
+
+    - name: Check API HTTP endpoint
+      run: |
+        echo "Checking API at $API_URL"
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL")
+        echo "HTTP Status: $STATUS"
+
+        if [ "$STATUS" -ne 200 ] && [ "$STATUS" -ne 202 ]; then
+          echo "❌ API health check failed"
+          exit 1
+        fi
+
+        echo "API is healthy"
