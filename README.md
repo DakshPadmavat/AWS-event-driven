@@ -21,14 +21,11 @@ CI/CD Workflow
   - Plan
   - Apply infrastructure changes
 
-Secrets Setup
-Add these GitHub repository secrets under:
-Settings → Secrets and variables → Actions
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-AWS_REGION
+Security Notice:
+This repository does not contain any credentials, secrets, or Terraform state files.
+AWS access is managed via IAM roles and GitHub Actions secrets following least-privilege principles.
 
 Deployment
 git add .
 git commit -m "Deploy"
-git push origin main
+git push origin main(or master)
