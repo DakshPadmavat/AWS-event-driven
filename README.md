@@ -11,7 +11,7 @@ This project implements an AWS event-driven pipeline using:
 
 ## Continuous Integration & Delivery (CI/CD)
 
-We use **GitHub Actions** to automate deployment:
+Used **GitHub Actions** to automate deployment:
 
 CI/CD Workflow
 
